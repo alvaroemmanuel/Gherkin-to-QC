@@ -1,4 +1,4 @@
-# require spreadsheetx
+require 'axlsx'
 
 current_path = File.dirname(__FILE__)
 
@@ -51,7 +51,25 @@ end
 
 print "\n}\n"
 
-xlsx_template = "#{current_path}/../templates/TnV Latam - Test Design Template.xlsx"
+package = Axlsx::Package.new
+wb = package.workbook
 
-workbook = SpreadsheetX.open xlsx_template
-p workbook.worksheets.last.name
+wb.add_worksheet(:name => 'Test Design') do |sheet|
+	sheet.add_row [
+									'Subject',
+									'Test Case Name',
+									'Step Name',
+									'Description',
+									'Expected Result',
+									'Execution Proof',
+									'Test Case Type',
+									'Test Category',
+									'Designer',
+									'Test Case Status',
+									'Positive/Negative',
+									'Regression Candidate',
+									'Test Case Number'
+								]
+end
+
+package.serialize 'C:\salida.xlsx'
