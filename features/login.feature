@@ -1,8 +1,17 @@
+@atag
 Feature: Login
   In order to use the application
   as a potential user
   I want to login the system.
+
+
+
+  Background:
+  	Given I have installed the application
+  	And My user has been setup
   
+
+
   @module1 @module2
   Scenario: Single login
   
