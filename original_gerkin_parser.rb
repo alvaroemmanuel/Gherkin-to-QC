@@ -20,10 +20,10 @@ formatter.done
 puts MultiJson.dump(MultiJson.load(io.string)[0], :pretty => true)
 
 res = MultiJson.load(io.string, :symbolize_keys => true)[0][:elements].select do |e|
-	e[:keyword] == 'Background'
+  e[:keyword] == 'Background'
 end
 
 res.each do |r|
-	p r
-	print "\n\n"
+  p r
+  print "\n\n"
 end

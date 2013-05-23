@@ -11,25 +11,25 @@ p f.description
 
 p 'Feature Tags:'
 f.tags.each do |tag|
-	p tag.name
+  p tag.name
 end
 
 p 'Background Steps:'
 f.background.steps.each do |step|
-	p step.keyword
-	p step.name
+  p step.keyword
+  p step.name
 end
 
 p 'Scenarios:'
 f.scenarios.each do |scenario|
-	p "Name: #{scenario.name}"
-	p 'Steps:'
-	scenario.steps.each do |step|
-		p step.keyword
-		p step.name
-	end
-	p 'Scenario Tags:'
-	scenario.tags.each do |tag|
-		p tag.name
-	end
+  p "Name: #{scenario.name}"
+  p 'Steps:'
+  scenario.steps.each do |step|
+    p step.keyword
+    p step.name
+  end
+  p 'Scenario Tags:'
+  scenario.tags.each do |tag|
+    p tag.name
+  end
 end
