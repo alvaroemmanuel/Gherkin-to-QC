@@ -33,3 +33,10 @@ f.scenarios.each do |scenario|
     p tag.name
   end
 end
+
+f.scenarios.each do |s|
+  p s == f.scenarios.first
+end
+
+str = 'When I enter the username "<username>"'
+p str.gsub(/["<>]/, '"' => '', '<' => '<<<', '>' => '>>>')

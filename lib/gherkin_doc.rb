@@ -65,16 +65,12 @@ module GherkinDoc
     feature = MultiJson.load(io.string, :symbolize_keys => true)[0]
 
     parser = Parser.new feature
-    parser.parse_feature
+    parser.get_feature
   end
 
   class Parser
     def initialize(feature)
       @json = feature
-    end
-
-    def parse_feature
-      get_feature
     end
 
     def get_feature
@@ -87,10 +83,9 @@ module GherkinDoc
       Feature.new name, description, background, scenarios, tags
     end
 
-    def get_background
-      return nil unless @json[:elements].index {|e| e[:keyword] == 'Background'}
-
+    def get_background      
       steps = get_steps 'Background'
+
       Background.new steps
     end
 
@@ -140,8 +135,10 @@ module GherkinDoc
 
       element = element[0]
 
-      element[:steps].each do |step|
-        steps << Step.new(step[:name], step[:keyword])
+      unless element.nil? || element.empty?
+        element[:steps].each do |step|
+          steps << Step.new(step[:name], step[:keyword])
+        end
       end
 
       steps

@@ -1,58 +1,48 @@
 require 'axlsx'
+require_relative 'lib/gherkin_doc.rb'
 
-current_path = File.dirname(__FILE__)
+file = File.expand_path(File.dirname(__FILE__) + '/features/login.feature')
 
-document = []
-document << {
-              subject: '02 - System Test\Path\To\QC\Folder',
-              test_case_name: 'Test1',
-              step_name: 'Step 1',
-              description: %Q|This is a test case.
-                             Here goes the test case body,
-                             it means, the description.|,
-              expected_result: 'The result of the test case',
-              execution_proof: 'N',
-              test_case_type: 'System',
-              test_category: 'Functional',
-              designer: 'vieyal01',
-              test_case_status: '3-Ready for Review',
-              positive_negative: 'Positive/Nominal',
-              regression_candidate: '3-Unknown',
-              test_case_number: 1
-            }
-
-document << {
-              subject: '',
-              test_case_name: '',
-              step_name: 'Step 2',
-              description: %Q|This is another test case.
-                             Here goes the test case body,
-                             this one is different.|,
-              expected_result: 'The result of the new test case',
-              execution_proof: 'Y',
-              test_case_type: 'System',
-              test_category: 'Functional',
-              designer: 'vieyal01',
-              test_case_status: '3-Ready for Review',
-              positive_negative: 'Positive/Nominal',
-              regression_candidate: '3-Unknown',
-              test_case_number: ''
-            }
-
-print "{\n"
-
-document.each do |row|
-  print "\t{\n"
-  row.each do |key, value|
-    print "\t\t#{key}: #{value}\n"
-  end
-  print "\t}\n"
-end
-
-print "\n}\n"
+f = GherkinDoc.parse file
 
 package = Axlsx::Package.new
 wb = package.workbook
+
+
+@tc_count = 1
+@step_count = 1
+@prev_step = nil
+
+
+def step_text(step, col)
+
+  case col
+  when :description
+    if @step_count == 1
+      value = step.keyword + step.name
+      @prev_step = :description
+    else
+      case step.keyword.strip
+      when 'Given', 'When'
+        value = step.keyword + step.name
+        @prev_step = :description
+      when 'And', 'But'
+        value = @prev_step == :description ? step.keyword + step.name : ''
+      end
+    end
+  when :result
+    case step.keyword.strip
+    when 'Then'
+      value = step.keyword + step.name
+      @prev_step = :result
+    when 'And', 'But'
+      value = @prev_step == :result ? step.keyword + step.name : ''
+    end
+  end
+
+  value.nil? ? value : value.gsub(/["<>]/, '"' => '', '<' => '<<<', '>' => '>>>')
+end
+
 
 wb.add_worksheet(:name => 'Test Design') do |sheet|
   sheet.add_row [
@@ -70,6 +60,33 @@ wb.add_worksheet(:name => 'Test Design') do |sheet|
                   'Regression Candidate',
                   'Test Case Number'
                 ]
+
+  f.scenarios.each do |tc|
+    p "TC: #{@tc_count}"
+    @step_count = 1
+    tc.steps.each do |step|
+      p "Step: #{@step_count}"
+      sheet.add_row [
+                      @step_count == 1 ? "02 - System Test\\" + f.name : '',
+                      @step_count == 1 ? tc.name : '',
+                      'Step ' + @step_count.to_s,
+                      step_text(step, :description),
+                      step_text(step, :result),
+                      'N',
+                      'System',
+                      'Functional',
+                      'vieyal01',
+                      '3-Ready for Review',
+                      'Positive/Nominal',
+                      '3-Unknown',
+                      @step_count == 1 ? @tc_count : ''
+                    ]
+
+      @step_count += 1
+    end
+
+    @tc_count += 1
+  end
 end
 
-package.serialize 'C:\salida.xlsx'
+package.serialize 'C:\Users\emmakun\Documents\Nielsen\Automation\salida.xlsx'
